@@ -1,0 +1,137 @@
+{
+  "patches": [
+    {
+      "op": "replace",
+      "path": "/paths/~1v1~1journal/get/parameters/0/schema/default",
+      "value": 1
+    },
+    {
+      "op": "replace",
+      "path": "/paths/~1v1~1journal/get/parameters/1/schema/default",
+      "value": 10
+    },
+    {
+      "op": "replace",
+      "path": "/paths/~1v1~1journal~1compute~1{computeId}/get/parameters/1/schema/default",
+      "value": 1
+    },
+    {
+      "op": "replace",
+      "path": "/paths/~1v1~1journal~1compute~1{computeId}/get/parameters/2/schema/default",
+      "value": 10
+    },
+    {
+      "op": "replace",
+      "path": "/paths/~1v1~1journal~1volume~1{volumeId}/get/parameters/1/schema/default",
+      "value": 1
+    },
+    {
+      "op": "replace",
+      "path": "/paths/~1v1~1journal~1volume~1{volumeId}/get/parameters/2/schema/default",
+      "value": 10
+    },
+    {
+      "op": "replace",
+      "path": "/paths/~1v1~1scripts/get/parameters/0/schema/default",
+      "value": 1
+    },
+    {
+      "op": "replace",
+      "path": "/paths/~1v1~1scripts/get/parameters/1/schema/default",
+      "value": 10
+    },
+    {
+      "op": "remove",
+      "path": "/paths/~1v1~1oauth2~1token/post/parameters"
+    },
+    {
+      "op": "replace",
+      "path": "/components/schemas/ScalingTriggers/required",
+      "value": ["queue_load"]
+    },
+    {
+      "op": "add",
+      "path": "/components/schemas/EntrypointOverridesSettingsPublicApiResponse",
+      "value": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "entrypoint": {
+            "type": ["array", "null"],
+            "items": {
+              "type": "string"
+            }
+          },
+          "cmd": {
+            "type": ["array", "null"],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["enabled"]
+      }
+    },
+    {
+      "op": "replace",
+      "path": "/components/schemas/ContainerPublicApiResponseDto/properties/entrypoint_overrides/allOf/0/$ref",
+      "value": "#/components/schemas/EntrypointOverridesSettingsPublicApiResponse"
+    },
+    {
+      "op": "add",
+      "path": "/components/schemas/UtilizationScalingTriggerPublicApiResponse",
+      "value": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "threshold": {
+            "type": ["number", "null"]
+          }
+        },
+        "required": ["enabled", "threshold"]
+      }
+    },
+    {
+      "op": "add",
+      "path": "/components/schemas/ScalingTriggersPublicApiResponse",
+      "value": {
+        "type": "object",
+        "properties": {
+          "queue_load": {
+            "$ref": "#/components/schemas/QueueLoadScalingTrigger"
+          },
+          "cpu_utilization": {
+            "$ref": "#/components/schemas/UtilizationScalingTriggerPublicApiResponse"
+          },
+          "gpu_utilization": {
+            "$ref": "#/components/schemas/UtilizationScalingTriggerPublicApiResponse"
+          }
+        },
+        "required": ["queue_load"]
+      }
+    },
+    {
+      "op": "replace",
+      "path": "/components/schemas/ScalingOptionsPublicApiDto/properties/scaling_triggers/allOf/0/$ref",
+      "value": "#/components/schemas/ScalingTriggersPublicApiResponse"
+    },
+    {
+      "op": "replace",
+      "path": "/components/schemas/ContainerPublicApiResponseDto/properties/image",
+      "value": {
+        "type": "object",
+        "properties": {
+          "image": {
+            "type": "string"
+          }
+        },
+        "required": ["image"],
+        "additionalProperties": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "patches": [
+    {
+      "op": "remove",
+      "path": "/paths/~1v2~1pods~1{id}~1logs"
+    },
+    {
+      "op": "remove",
+      "path": "/paths/~1v2~1serverless~1{id}~1workers~1{workerId}~1logs"
+    }
+  ]
+}

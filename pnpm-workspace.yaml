@@ -1,0 +1,12 @@
+packages: []
+strictPeerDependencies: true
+allowBuilds:
+  esbuild: true
+  fsevents: true
+peerDependencyRules:
+  allowAny:
+    - vite
+    - vitest
+  allowedVersions:
+    vite: "*"
+    vitest: "*"

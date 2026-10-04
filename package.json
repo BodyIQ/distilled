@@ -1,0 +1,50 @@
+{
+  "name": "@zinnia/distilled",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "files": [
+    "dist",
+    "README.md",
+    "runpod/LICENSE",
+    "verda/LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    },
+    "./runpod": {
+      "types": "./dist/runpod/src/index.d.ts",
+      "default": "./dist/runpod/src/index.js"
+    },
+    "./verda": {
+      "types": "./dist/verda/src/index.d.ts",
+      "default": "./dist/verda/src/index.js"
+    }
+  },
+  "scripts": {
+    "convert": "bun runpod/scripts/convert.ts && bun verda/scripts/convert.ts",
+    "generate": "pnpm convert && bun runpod/scripts/generate.ts && bun verda/scripts/generate.ts",
+    "check:generated": "node check-generated.mjs runpod/.generated-specs runpod/src/services verda/.generated-specs verda/src/services",
+    "build": "tsc -p tsconfig.build.json",
+    "check": "vp check --no-fmt .",
+    "test": "vp test run",
+    "check:quality": "effect-tsgo patch --no-typescript --oxlint && pnpm check:generated && pnpm build && pnpm check && pnpm test",
+    "check:artifacts": "pnpm build && git diff --exit-code -- dist"
+  },
+  "dependencies": {
+    "@distilled.cloud/core": "1.0.0-rc.13",
+    "effect": "4.0.0"
+  },
+  "devDependencies": {
+    "@effect/platform-bun": "4.0.0",
+    "@effect/tsgo": "0.48.0",
+    "@types/bun": "1.3.10",
+    "@types/node": "^22",
+    "typescript": "5.9.3",
+    "vite-plus": "1.0.0"
+  },
+  "packageManager": "pnpm@11.17.0"
+}

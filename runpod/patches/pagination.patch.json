@@ -1,0 +1,54 @@
+{
+  "patches": [
+    {
+      "op": "add",
+      "path": "/shapes/com.runpod.api#ListPods/traits/smithy.api#paginated",
+      "value": {
+        "mode": "cursor",
+        "inputToken": "cursor",
+        "outputToken": "pagination.nextCursor",
+        "items": "pods"
+      }
+    },
+    {
+      "op": "add",
+      "path": "/shapes/com.runpod.api#ListEndpoints/traits/smithy.api#paginated",
+      "value": {
+        "mode": "cursor",
+        "inputToken": "cursor",
+        "outputToken": "pagination.nextCursor",
+        "items": "endpoints"
+      }
+    },
+    {
+      "op": "add",
+      "path": "/shapes/com.runpod.api#ListEndpointReleases/traits/smithy.api#paginated",
+      "value": {
+        "mode": "cursor",
+        "inputToken": "cursor",
+        "outputToken": "pagination.nextCursor",
+        "items": "releases"
+      }
+    },
+    {
+      "op": "add",
+      "path": "/shapes/com.runpod.api#ListEndpointBuilds/traits/smithy.api#paginated",
+      "value": {
+        "mode": "cursor",
+        "inputToken": "cursor",
+        "outputToken": "pagination.nextCursor",
+        "items": "builds"
+      }
+    },
+    {
+      "op": "add",
+      "path": "/shapes/com.runpod.api#ListTemplates/traits/smithy.api#paginated",
+      "value": {
+        "mode": "cursor",
+        "inputToken": "cursor",
+        "outputToken": "pagination.nextCursor",
+        "items": "templates"
+      }
+    }
+  ]
+}
