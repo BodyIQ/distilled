@@ -32,7 +32,7 @@
     "check": "vp check --no-fmt .",
     "test": "vp test run",
     "check:quality": "effect-tsgo patch --no-typescript --oxlint && pnpm check:generated && pnpm build && pnpm check && pnpm test",
-    "check:artifacts": "pnpm build && git diff --exit-code -- dist"
+    "check:artifacts": "pnpm build && node check-artifacts.mjs"
   },
   "dependencies": {
     "@distilled.cloud/core": "1.0.0-rc.13",

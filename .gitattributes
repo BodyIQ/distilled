@@ -1,0 +1,2 @@
+# Preserve TypeScript compiler output byte-for-byte, including emitted whitespace.
+dist/** -whitespace
