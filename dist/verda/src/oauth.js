@@ -27,7 +27,10 @@ export const fromClientCredentials = (http, options) => Effect.gen(function* () 
                 client_id: options.clientId,
                 client_secret: Redacted.value(options.clientSecret),
             },
-        }).pipe(Effect.provideService(Credentials, Effect.succeed({ apiBaseUrl })), Effect.provideService(HttpClient.HttpClient, http), Effect.provide(strict), Effect.mapError(() => new VerdaError({ operation: "authentication" })));
+        }).pipe(Effect.provideService(Credentials, Effect.succeed({ apiBaseUrl })), Effect.provideService(HttpClient.HttpClient, http), Effect.provide(strict), Effect.mapError((error) => new VerdaError({
+            operation: "authentication",
+            message: error.message,
+        })));
         const config = { apiBaseUrl, accessToken: Redacted.make(response.access_token) };
         yield* Ref.set(token, {
             config,

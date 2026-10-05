@@ -145,6 +145,15 @@ test("404 is tagged and 204 deletion has no JSON body", async () => {
   await f.run(Runpod.deleteEndpoint({ id: "ep-1" }));
 });
 
+test("REST failures retain the server's error message", async () => {
+  const message = "GPU pool is not available";
+  const f = fixture(() => Response.json({ message }, { status: 400 }));
+  await assert.rejects(
+    f.run(Runpod.getEndpoint({ id: "ep-1" })),
+    (error) => error.message === message,
+  );
+});
+
 test("strict decoding rejects malformed success responses without exposing their body", async () => {
   const f = fixture(() => ({ secret: "do-not-log" }));
   await assert.rejects(
@@ -207,14 +216,14 @@ test("cache read and unchanged cache updates never write", async () => {
   assert.equal(f.calls.filter((c) => c.body.query.startsWith("mutation")).length, 0);
 });
 
-test("GraphQL errors even with partial data fail without echoing secrets", async () => {
+test("GraphQL errors retain the server's message even with partial data", async () => {
   const f = fixture(() => ({
     data: { myself: { endpoint: cachedConfig() } },
-    errors: [{ message: "secret-token" }],
+    errors: [{ message: "Model revision is not available" }],
   }));
   await assert.rejects(
     f.run(Runpod.setCachedModels({ id: "ep-1", models: ["model"] })),
-    (error) => !String(error).includes("secret-token"),
+    (error) => error.message === "Model revision is not available",
   );
   assert.equal(f.calls.length, 1);
 });

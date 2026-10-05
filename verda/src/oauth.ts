@@ -41,7 +41,10 @@ export const fromClientCredentials = (
         Effect.provideService(Credentials, Effect.succeed({ apiBaseUrl })),
         Effect.provideService(HttpClient.HttpClient, http),
         Effect.provide(strict),
-        Effect.mapError(() => new VerdaError({ operation: "authentication" })),
+        Effect.mapError((error) => new VerdaError({
+          operation: "authentication",
+          message: error.message,
+        })),
       );
       const config = { apiBaseUrl, accessToken: Redacted.make(response.access_token) };
       yield* Ref.set(token, {
