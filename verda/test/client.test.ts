@@ -162,3 +162,28 @@ test("response validation preserves the schema error cause", async () => {
     assert.equal(error.message, error.cause.message);
   }
 });
+
+test("deployment responses accept disabled health checks and public registry settings", async () => {
+  const deployment = {
+    name: "public-image",
+    endpoint_base_url: "https://containers.verda.com/public-image",
+    created_at: "2026-10-05T04:13:40Z",
+    compute: { name: "H100", size: 1 },
+    container_registry_settings: { is_private: false },
+    is_spot: false,
+    containers: [{
+      name: "public-image-0",
+      image: { image: "docker.io/library/busybox:1.37" },
+      exposed_port: 5000,
+      healthcheck: { enabled: false, port: null, path: null },
+      entrypoint_overrides: { enabled: false, entrypoint: null, cmd: null },
+      env: [],
+      volume_mounts: [],
+    }],
+  };
+  const f = fixture((path) => path.endsWith("/token") ? token() : Response.json(deployment));
+  const result = await Effect.runPromise(
+    Verda.getDeployment({ deployment_name: deployment.name }).pipe(Effect.provide(await f.services)),
+  );
+  assert.deepEqual(result, deployment);
+});
