@@ -7,7 +7,6 @@ import * as Ref from "effect/Ref";
 import * as HttpClient from "effect/http/HttpClient";
 import { strict } from "@distilled.cloud/core/response-validation";
 import { Credentials } from "./credentials.js";
-import { VerdaError } from "./errors.js";
 import { getAccessToken } from "./services/verda.js";
 /** Allocate one OAuth token cache for a client. No request runs until an operation is invoked. */
 export const fromClientCredentials = (http, options) => Effect.gen(function* () {
@@ -27,7 +26,7 @@ export const fromClientCredentials = (http, options) => Effect.gen(function* () 
                 client_id: options.clientId,
                 client_secret: Redacted.value(options.clientSecret),
             },
-        }).pipe(Effect.provideService(Credentials, Effect.succeed({ apiBaseUrl })), Effect.provideService(HttpClient.HttpClient, http), Effect.provide(strict), Effect.mapError(() => new VerdaError({ operation: "authentication" })));
+        }).pipe(Effect.provideService(Credentials, Effect.succeed({ apiBaseUrl })), Effect.provideService(HttpClient.HttpClient, http), Effect.provide(strict));
         const config = { apiBaseUrl, accessToken: Redacted.make(response.access_token) };
         yield* Ref.set(token, {
             config,

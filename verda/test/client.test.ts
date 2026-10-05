@@ -121,21 +121,38 @@ test("404 is tagged, IDs are encoded, and empty deletion is supported", async ()
   assert.equal(f.requests[1].path, "/v1/container-deployments/missing%2Fname");
 });
 
-test("authentication, API, and validation failures do not retain echoed secrets", async () => {
-  for (const mode of ["authentication", "api", "validation"] as const) {
-    const secret = "echoed-sensitive-value";
+test("authentication and API failures preserve the provider's error message", async () => {
+  for (const mode of ["authentication", "api"] as const) {
+    const message =
+      mode === "api"
+        ? "name must be shorter than or equal to 45 characters"
+        : "invalid client credentials";
     const f = fixture((path) =>
       path.endsWith("/token")
         ? mode === "authentication"
-          ? Response.json({ message: secret }, { status: 401 })
+          ? Response.json({ message }, { status: 401 })
           : token()
-        : Response.json({ message: secret }, { status: mode === "api" ? 500 : 200 }),
+        : Response.json({ code: "invalid_request", message }, { status: 400 }),
     );
-    const services = await f.services;
     const error = await Effect.runPromise(
-      Verda.listDeployments({}).pipe(Effect.flip, Effect.provide(services)),
+      Verda.listDeployments({}).pipe(Effect.flip, Effect.provide(await f.services)),
     );
-    assert.equal(JSON.stringify(error).includes(secret), false);
-    assert.equal(String(error).includes(secret), false);
+    assert.equal(error.message, message);
+    assert.equal(error._tag, mode === "api" ? "BadRequest" : "Unauthorized");
+  }
+});
+
+test("response validation preserves the schema error cause", async () => {
+  const f = fixture((path) =>
+    path.endsWith("/token") ? token() : Response.json([{}]),
+  );
+  const error = await Effect.runPromise(
+    Verda.listDeployments({}).pipe(Effect.flip, Effect.provide(await f.services)),
+  );
+  assert.equal(error._tag, "VerdaError");
+  if (error._tag === "VerdaError") {
+    assert.equal(error.operation, "REST response validation");
+    assert.ok(error.cause instanceof Error);
+    assert.equal(error.message, error.cause.message);
   }
 });

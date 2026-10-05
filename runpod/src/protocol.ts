@@ -18,8 +18,25 @@ export const RunpodProtocol = makeRestProtocol<Config>({
   }),
   baseUrl: (config) => config.apiBaseUrl ?? "https://api.runpod.io",
   headers: (config) => ({ Authorization: `Bearer ${Redacted.value(config.apiKey)}` }),
-  // API failures can echo container environment secrets. Never retain their bodies.
-  errorEnvelope: () => ({ message: "RunPod request failed" }),
-  unknownError: () => new RunpodError({ operation: "REST request" }),
-  parseError: () => new RunpodError({ operation: "REST response validation" }),
+  errorEnvelope: (body) => {
+    if (body === null || typeof body !== "object") return undefined;
+    const error = body as Record<string, unknown>;
+    return {
+      code:
+        typeof error.code === "string" || typeof error.code === "number"
+          ? error.code
+          : undefined,
+      message: [error.detail, error.message, error.error, error.title].find(
+        (value): value is string => typeof value === "string",
+      ),
+    };
+  },
+  unknownError: (info) =>
+    new RunpodError({ operation: "REST request", message: info.message }),
+  parseError: (info) =>
+    new RunpodError({
+      operation: "REST response validation",
+      cause: info.cause,
+      message: info.cause instanceof Error ? info.cause.message : String(info.cause),
+    }),
 });
