@@ -147,3 +147,18 @@ test("authentication and API failures preserve the provider's error message", as
     assert.equal(error._tag, mode === "api" ? "BadRequest" : "Unauthorized");
   }
 });
+
+test("response validation preserves the schema error cause", async () => {
+  const f = fixture((path) =>
+    path.endsWith("/token") ? token() : Response.json([{}]),
+  );
+  const error = await Effect.runPromise(
+    Verda.listDeployments({}).pipe(Effect.flip, Effect.provide(await f.services)),
+  );
+  assert.equal(error._tag, "VerdaError");
+  if (error._tag === "VerdaError") {
+    assert.equal(error.operation, "REST response validation");
+    assert.ok(error.cause instanceof Error);
+    assert.equal(error.message, error.cause.message);
+  }
+});
