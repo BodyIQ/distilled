@@ -31,6 +31,12 @@ export const RunpodProtocol = makeRestProtocol<Config>({
       ),
     };
   },
-  unknownError: () => new RunpodError({ operation: "REST request" }),
-  parseError: () => new RunpodError({ operation: "REST response validation" }),
+  unknownError: (info) =>
+    new RunpodError({ operation: "REST request", message: info.message }),
+  parseError: (info) =>
+    new RunpodError({
+      operation: "REST response validation",
+      cause: info.cause,
+      message: info.cause instanceof Error ? info.cause.message : String(info.cause),
+    }),
 });
