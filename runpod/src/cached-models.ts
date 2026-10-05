@@ -55,21 +55,25 @@ const graphql = <A>(
       },
     );
     if (response.status !== 200)
-      return yield* Effect.fail(new RunpodError({ operation: "cached models HTTP" }));
+      return yield* Effect.fail(new RunpodError({
+        operation: "cached models HTTP",
+        message: `RunPod cached models returned HTTP ${response.status}`,
+      }));
     const decoded = yield* Schema.decodeUnknownEffect(
       Schema.Struct({
         data: Schema.optional(Schema.NullOr(data)),
-        errors: Schema.optional(Schema.Array(Schema.Unknown)),
+        errors: Schema.optional(Schema.Array(Schema.Struct({ message: Schema.String }))),
       }),
     )(yield* response.json);
     if (decoded.errors?.length || !decoded.data)
       return yield* Effect.fail(
-        new RunpodError({ operation: "cached models GraphQL" }),
+        new RunpodError({
+          operation: "cached models GraphQL",
+          message: decoded.errors?.map((error) => error.message).join("; ") || "RunPod returned no cached models data",
+        }),
       );
     return decoded.data;
-  }).pipe(
-    Effect.mapError(() => new RunpodError({ operation: "cached models request" })),
-  );
+  });
 
 export const getCachedModels = Effect.fn(function* ({ id }: { id: string }) {
   const { myself } = yield* graphql(

@@ -74,6 +74,12 @@ function fixture(handle) {
   };
 }
 
+test("unrecognized REST statuses preserve provider messages", async () => {
+  const f = fixture(() => Response.json({ detail: "Selected GPU is unavailable" }, { status: 418 }));
+  const error = await f.run(Runpod.getEndpoint({ id: "ep-1" }).pipe(Effect.flip));
+  assert.equal(error.message, "Selected GPU is unavailable");
+});
+
 test("v2 calls encode IDs and resolve credentials on every request", async () => {
   const f = fixture(() => endpoint());
   await f.run(Runpod.getEndpoint({ id: "ep/1" }));
@@ -220,14 +226,14 @@ test("cache read and unchanged cache updates never write", async () => {
   assert.equal(f.calls.filter((c) => c.body.query.startsWith("mutation")).length, 0);
 });
 
-test("GraphQL errors even with partial data fail without echoing secrets", async () => {
+test("GraphQL errors even with partial data preserve provider messages", async () => {
   const f = fixture(() => ({
     data: { myself: { endpoint: cachedConfig() } },
-    errors: [{ message: "secret-token" }],
+    errors: [{ message: "Cached model revision was not found" }],
   }));
   await assert.rejects(
     f.run(Runpod.setCachedModels({ id: "ep-1", models: ["model"] })),
-    (error) => !String(error).includes("secret-token"),
+    (error) => String(error).includes("Cached model revision was not found"),
   );
   assert.equal(f.calls.length, 1);
 });

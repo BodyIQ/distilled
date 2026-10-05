@@ -10693,7 +10693,7 @@
           }
         },
         "container_registry_settings": {
-          "target": "com.verda.api#ContainerRegistrySettingsPublicApiDto",
+          "target": "com.verda.api#ContainerRegistrySettingsPublicApiResponse",
           "traits": {
             "smithy.api#documentation": "Container registry settings",
             "smithy.api#required": {}
@@ -10725,7 +10725,7 @@
           }
         },
         "healthcheck": {
-          "target": "com.verda.api#HealthcheckSettings",
+          "target": "com.verda.api#HealthcheckSettingsPublicApiResponse",
           "traits": {
             "smithy.api#documentation": "Healthcheck settings for the container"
           }
@@ -10764,28 +10764,27 @@
       },
       "traits": {}
     },
-    "com.verda.api#HealthcheckSettings": {
+    "com.verda.api#HealthcheckSettingsPublicApiResponse": {
       "type": "structure",
       "members": {
         "enabled": {
           "target": "smithy.api#Boolean",
           "traits": {
-            "smithy.api#documentation": "Is healthcheck enabled for the container. It it used to check if the container is ready to accept traffic",
             "smithy.api#required": {}
           }
         },
         "port": {
           "target": "smithy.api#Double",
           "traits": {
-            "smithy.api#documentation": "Port to be used for healthcheck",
-            "smithy.api#required": {}
+            "smithy.api#required": {},
+            "com.distilled.openapi#nullable": {}
           }
         },
         "path": {
           "target": "smithy.api#String",
           "traits": {
-            "smithy.api#documentation": "Path to be used for healthcheck",
-            "smithy.api#required": {}
+            "smithy.api#required": {},
+            "com.distilled.openapi#nullable": {}
           }
         }
       },
@@ -11159,22 +11158,17 @@
         "smithy.api#documentation": "Containers in the deployment"
       }
     },
-    "com.verda.api#ContainerRegistrySettingsPublicApiDto": {
+    "com.verda.api#ContainerRegistrySettingsPublicApiResponse": {
       "type": "structure",
       "members": {
         "is_private": {
           "target": "smithy.api#Boolean",
           "traits": {
-            "smithy.api#documentation": "Privacy mode of the container registry - is it public or private",
             "smithy.api#required": {}
           }
         },
         "credentials": {
-          "target": "com.verda.api#ContainerRegistryCredentials",
-          "traits": {
-            "smithy.api#documentation": "Credential details for the registry if it is private. Required if privacy mode is private",
-            "smithy.api#required": {}
-          }
+          "target": "com.verda.api#ContainerRegistryCredentials"
         }
       },
       "traits": {}
@@ -11231,6 +11225,26 @@
         "smithy.api#documentation": "Get all deployments"
       }
     },
+    "com.verda.api#ContainerRegistrySettingsPublicApiDto": {
+      "type": "structure",
+      "members": {
+        "is_private": {
+          "target": "smithy.api#Boolean",
+          "traits": {
+            "smithy.api#documentation": "Privacy mode of the container registry - is it public or private",
+            "smithy.api#required": {}
+          }
+        },
+        "credentials": {
+          "target": "com.verda.api#ContainerRegistryCredentials",
+          "traits": {
+            "smithy.api#documentation": "Credential details for the registry if it is private. Required if privacy mode is private",
+            "smithy.api#required": {}
+          }
+        }
+      },
+      "traits": {}
+    },
     "com.verda.api#ContainerPublicApiDto": {
       "type": "structure",
       "members": {
@@ -11276,6 +11290,33 @@
           "target": "com.verda.api#ContainerPublicApiDtoVolumeMountsList",
           "traits": {
             "smithy.api#documentation": "Volume mounts for the container"
+          }
+        }
+      },
+      "traits": {}
+    },
+    "com.verda.api#HealthcheckSettings": {
+      "type": "structure",
+      "members": {
+        "enabled": {
+          "target": "smithy.api#Boolean",
+          "traits": {
+            "smithy.api#documentation": "Is healthcheck enabled for the container. It it used to check if the container is ready to accept traffic",
+            "smithy.api#required": {}
+          }
+        },
+        "port": {
+          "target": "smithy.api#Double",
+          "traits": {
+            "smithy.api#documentation": "Port to be used for healthcheck",
+            "smithy.api#required": {}
+          }
+        },
+        "path": {
+          "target": "smithy.api#String",
+          "traits": {
+            "smithy.api#documentation": "Path to be used for healthcheck",
+            "smithy.api#required": {}
           }
         }
       },

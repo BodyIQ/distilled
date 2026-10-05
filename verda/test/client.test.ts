@@ -38,6 +38,12 @@ const token = (value = "test-token") =>
     scope: "cloud-api-v1",
   });
 
+test("unrecognized REST statuses preserve provider messages", async () => {
+  const f = fixture((path) => path.endsWith("/token") ? token() : Response.json({ message: "Selected GPU is unavailable" }, { status: 418 }));
+  const error = await Effect.runPromise(Verda.listDeployments({}).pipe(Effect.flip, Effect.provide(await f.services)));
+  assert.equal(error.message, "Selected GPU is unavailable");
+});
+
 test("OAuth is lazy, caches concurrent requests, and renews before expiry", async () => {
   let issued = 0;
   let now = 0;
@@ -155,4 +161,29 @@ test("response validation preserves the schema error cause", async () => {
     assert.ok(error.cause instanceof Error);
     assert.equal(error.message, error.cause.message);
   }
+});
+
+test("deployment responses accept disabled health checks and public registry settings", async () => {
+  const deployment = {
+    name: "public-image",
+    endpoint_base_url: "https://containers.verda.com/public-image",
+    created_at: "2026-10-05T04:13:40Z",
+    compute: { name: "H100", size: 1 },
+    container_registry_settings: { is_private: false },
+    is_spot: false,
+    containers: [{
+      name: "public-image-0",
+      image: { image: "docker.io/library/busybox:1.37" },
+      exposed_port: 5000,
+      healthcheck: { enabled: false, port: null, path: null },
+      entrypoint_overrides: { enabled: false, entrypoint: null, cmd: null },
+      env: [],
+      volume_mounts: [],
+    }],
+  };
+  const f = fixture((path) => path.endsWith("/token") ? token() : Response.json(deployment));
+  const result = await Effect.runPromise(
+    Verda.getDeployment({ deployment_name: deployment.name }).pipe(Effect.provide(await f.services)),
+  );
+  assert.deepEqual(result, deployment);
 });

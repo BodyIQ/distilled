@@ -132,6 +132,51 @@
         "required": ["image"],
         "additionalProperties": true
       }
+    },
+    {
+      "op": "add",
+      "path": "/components/schemas/HealthcheckSettingsPublicApiResponse",
+      "value": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "port": {
+            "type": ["number", "null"]
+          },
+          "path": {
+            "type": ["string", "null"]
+          }
+        },
+        "required": ["enabled", "port", "path"]
+      }
+    },
+    {
+      "op": "replace",
+      "path": "/components/schemas/ContainerPublicApiResponseDto/properties/healthcheck/allOf/0/$ref",
+      "value": "#/components/schemas/HealthcheckSettingsPublicApiResponse"
+    },
+    {
+      "op": "add",
+      "path": "/components/schemas/ContainerRegistrySettingsPublicApiResponse",
+      "value": {
+        "type": "object",
+        "properties": {
+          "is_private": {
+            "type": "boolean"
+          },
+          "credentials": {
+            "$ref": "#/components/schemas/ContainerRegistryCredentials"
+          }
+        },
+        "required": ["is_private"]
+      }
+    },
+    {
+      "op": "replace",
+      "path": "/components/schemas/DeploymentPublicApiResponseDto/properties/container_registry_settings/allOf/0/$ref",
+      "value": "#/components/schemas/ContainerRegistrySettingsPublicApiResponse"
     }
   ]
 }
