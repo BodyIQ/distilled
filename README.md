@@ -36,7 +36,7 @@ or compilation. CI checks regeneration, types, tests and compiled artifact drift
 and uploads a packed package for inspection. Adding another cloud adds a directory
 and an export to this package, not another repository or workspace package.
 
-RunPod retains cursor pagination patches, SSE exclusions and its cached-model
-extension. Verda uses lazy OAuth credentials with serialized renewal, response
+RunPod uses the generated REST v2 client with cursor pagination patches and SSE
+exclusions. Verda uses lazy OAuth credentials with serialized renewal, response
 nullability patches and literal volume discriminants. REST errors preserve the cloud's message, including RunPod problem details,
 and OAuth failures keep their original tagged error. Credentials stay redacted. Runtime clients have no Alchemy dependency.

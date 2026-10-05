@@ -21,5 +21,6 @@ const endpoints = Stream.runCollect(listEndpoints.items({})).pipe(
 ```
 
 Provide your Effect HTTP client layer to `endpoints`. `apiBaseUrl` can be set in
-the credential configuration for local fixtures. The cached-model extension
-preserves the endpoint's existing configuration.
+the credential configuration for local fixtures. All operations use REST v2;
+there is no GraphQL cached-model extension. Network volume configuration is
+available through the generated endpoint operations.
