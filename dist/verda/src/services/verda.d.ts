@@ -425,6 +425,12 @@ export interface CreateDeploymentRequest {
     is_verda_io?: boolean;
 }
 export declare const CreateDeploymentRequest: S.Codec<CreateDeploymentRequest>;
+export interface HealthcheckSettingsPublicApiResponse {
+    enabled: boolean;
+    port: number | null;
+    path: string | null;
+}
+export declare const HealthcheckSettingsPublicApiResponse: S.Codec<HealthcheckSettingsPublicApiResponse>;
 export type EntrypointOverridesSettingsPublicApiResponseEntrypointList = Array<string>;
 export declare const EntrypointOverridesSettingsPublicApiResponseEntrypointList: S.Codec<EntrypointOverridesSettingsPublicApiResponseEntrypointList>;
 export type EntrypointOverridesSettingsPublicApiResponseCmdList = Array<string>;
@@ -453,7 +459,7 @@ export interface ContainerPublicApiResponseDto {
     /** Port to be exposed by the container */
     exposed_port: number;
     /** Healthcheck settings for the container */
-    healthcheck?: HealthcheckSettings;
+    healthcheck?: HealthcheckSettingsPublicApiResponse;
     /** Entrypoint overrides settings for the container */
     entrypoint_overrides?: EntrypointOverridesSettingsPublicApiResponse;
     /** Environment variables for the container */
@@ -468,6 +474,11 @@ export declare const ContainerPublicApiResponseDto: S.Codec<ContainerPublicApiRe
 /** Containers in the deployment */
 export type DeploymentPublicApiResponseDtoContainersList = Array<ContainerPublicApiResponseDto>;
 export declare const DeploymentPublicApiResponseDtoContainersList: S.Codec<DeploymentPublicApiResponseDtoContainersList>;
+export interface ContainerRegistrySettingsPublicApiResponse {
+    is_private: boolean;
+    credentials?: ContainerRegistryCredentials;
+}
+export declare const ContainerRegistrySettingsPublicApiResponse: S.Codec<ContainerRegistrySettingsPublicApiResponse>;
 export interface DeploymentPublicApiResponseDto {
     /** Deployment name */
     name: string;
@@ -479,7 +490,7 @@ export interface DeploymentPublicApiResponseDto {
     /** Compute resource details */
     compute: ComputeResource;
     /** Container registry settings */
-    container_registry_settings: ContainerRegistrySettingsPublicApiDto;
+    container_registry_settings: ContainerRegistrySettingsPublicApiResponse;
     is_spot: boolean;
 }
 export declare const DeploymentPublicApiResponseDto: S.Codec<DeploymentPublicApiResponseDto>;

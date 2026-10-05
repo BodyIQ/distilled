@@ -876,6 +876,21 @@ export const CreateDeploymentRequest = /*@__PURE__*/ S.suspend(() =>
   identifier: "CreateDeploymentRequest",
 }) as any as S.Codec<CreateDeploymentRequest>;
 
+export interface HealthcheckSettingsPublicApiResponse {
+  enabled: boolean;
+  port: number | null;
+  path: string | null;
+}
+export const HealthcheckSettingsPublicApiResponse = /*@__PURE__*/ S.suspend(() =>
+  S.Struct({
+    enabled: S.Boolean,
+    port: S.NullOr(S.Number),
+    path: S.NullOr(S.String),
+  }),
+).annotate({
+  identifier: "HealthcheckSettingsPublicApiResponse",
+}) as any as S.Codec<HealthcheckSettingsPublicApiResponse>;
+
 export type EntrypointOverridesSettingsPublicApiResponseEntrypointList = Array<string>;
 export const EntrypointOverridesSettingsPublicApiResponseEntrypointList =
   /*@__PURE__*/ S.Array(
@@ -948,7 +963,7 @@ export interface ContainerPublicApiResponseDto {
   /** Port to be exposed by the container */
   exposed_port: number;
   /** Healthcheck settings for the container */
-  healthcheck?: HealthcheckSettings;
+  healthcheck?: HealthcheckSettingsPublicApiResponse;
   /** Entrypoint overrides settings for the container */
   entrypoint_overrides?: EntrypointOverridesSettingsPublicApiResponse;
   /** Environment variables for the container */
@@ -963,7 +978,7 @@ export const ContainerPublicApiResponseDto = /*@__PURE__*/ S.suspend(() =>
   S.Struct({
     should_use_cached_image: S.optional(S.Boolean),
     exposed_port: S.Number,
-    healthcheck: S.optional(HealthcheckSettings),
+    healthcheck: S.optional(HealthcheckSettingsPublicApiResponse),
     entrypoint_overrides: S.optional(EntrypointOverridesSettingsPublicApiResponse),
     env: S.optional(ContainerPublicApiResponseDtoEnvList),
     volume_mounts: S.optional(ContainerPublicApiResponseDtoVolumeMountsList),
@@ -981,6 +996,19 @@ export const DeploymentPublicApiResponseDtoContainersList = /*@__PURE__*/ S.Arra
   ContainerPublicApiResponseDto,
 ) as any as S.Codec<DeploymentPublicApiResponseDtoContainersList>;
 
+export interface ContainerRegistrySettingsPublicApiResponse {
+  is_private: boolean;
+  credentials?: ContainerRegistryCredentials;
+}
+export const ContainerRegistrySettingsPublicApiResponse = /*@__PURE__*/ S.suspend(() =>
+  S.Struct({
+    is_private: S.Boolean,
+    credentials: S.optional(ContainerRegistryCredentials),
+  }),
+).annotate({
+  identifier: "ContainerRegistrySettingsPublicApiResponse",
+}) as any as S.Codec<ContainerRegistrySettingsPublicApiResponse>;
+
 export interface DeploymentPublicApiResponseDto {
   /** Deployment name */
   name: string;
@@ -992,7 +1020,7 @@ export interface DeploymentPublicApiResponseDto {
   /** Compute resource details */
   compute: ComputeResource;
   /** Container registry settings */
-  container_registry_settings: ContainerRegistrySettingsPublicApiDto;
+  container_registry_settings: ContainerRegistrySettingsPublicApiResponse;
   is_spot: boolean;
 }
 export const DeploymentPublicApiResponseDto = /*@__PURE__*/ S.suspend(() =>
@@ -1002,7 +1030,7 @@ export const DeploymentPublicApiResponseDto = /*@__PURE__*/ S.suspend(() =>
     endpoint_base_url: S.String,
     created_at: S.String,
     compute: ComputeResource,
-    container_registry_settings: ContainerRegistrySettingsPublicApiDto,
+    container_registry_settings: ContainerRegistrySettingsPublicApiResponse,
     is_spot: S.Boolean,
   }),
 ).annotate({

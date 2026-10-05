@@ -343,6 +343,13 @@ export const CreateDeploymentRequest = /*@__PURE__*/ S.suspend(() => S.Struct({
 }).pipe(T.Http({ method: "POST", uri: "/v1/container-deployments", code: 200 }))).annotate({
     identifier: "CreateDeploymentRequest",
 });
+export const HealthcheckSettingsPublicApiResponse = /*@__PURE__*/ S.suspend(() => S.Struct({
+    enabled: S.Boolean,
+    port: S.NullOr(S.Number),
+    path: S.NullOr(S.String),
+})).annotate({
+    identifier: "HealthcheckSettingsPublicApiResponse",
+});
 export const EntrypointOverridesSettingsPublicApiResponseEntrypointList = 
 /*@__PURE__*/ S.Array(S.String);
 export const EntrypointOverridesSettingsPublicApiResponseCmdList = 
@@ -370,7 +377,7 @@ export const ContainerPublicApiResponseDtoImage = /*@__PURE__*/ S.suspend(() => 
 export const ContainerPublicApiResponseDto = /*@__PURE__*/ S.suspend(() => S.Struct({
     should_use_cached_image: S.optional(S.Boolean),
     exposed_port: S.Number,
-    healthcheck: S.optional(HealthcheckSettings),
+    healthcheck: S.optional(HealthcheckSettingsPublicApiResponse),
     entrypoint_overrides: S.optional(EntrypointOverridesSettingsPublicApiResponse),
     env: S.optional(ContainerPublicApiResponseDtoEnvList),
     volume_mounts: S.optional(ContainerPublicApiResponseDtoVolumeMountsList),
@@ -380,13 +387,19 @@ export const ContainerPublicApiResponseDto = /*@__PURE__*/ S.suspend(() => S.Str
     identifier: "ContainerPublicApiResponseDto",
 });
 export const DeploymentPublicApiResponseDtoContainersList = /*@__PURE__*/ S.Array(ContainerPublicApiResponseDto);
+export const ContainerRegistrySettingsPublicApiResponse = /*@__PURE__*/ S.suspend(() => S.Struct({
+    is_private: S.Boolean,
+    credentials: S.optional(ContainerRegistryCredentials),
+})).annotate({
+    identifier: "ContainerRegistrySettingsPublicApiResponse",
+});
 export const DeploymentPublicApiResponseDto = /*@__PURE__*/ S.suspend(() => S.Struct({
     name: S.String,
     containers: DeploymentPublicApiResponseDtoContainersList,
     endpoint_base_url: S.String,
     created_at: S.String,
     compute: ComputeResource,
-    container_registry_settings: ContainerRegistrySettingsPublicApiDto,
+    container_registry_settings: ContainerRegistrySettingsPublicApiResponse,
     is_spot: S.Boolean,
 })).annotate({
     identifier: "DeploymentPublicApiResponseDto",
