@@ -218,12 +218,19 @@ test("cached-model overlay preserves the v2 bound template, GPU exclusions, scal
   assert.ok(f.calls.every((c) => c.url.pathname === "/graphql"));
 });
 
-test("cache read and unchanged cache updates never write", async () => {
+test("cache reads never write; unchanged model references still refresh template environment", async () => {
   const live = cachedConfig();
-  const f = fixture(() => ({ data: { myself: { endpoint: live } } }));
+  live.template.env = [{ key: "HF_HUB_CACHE", value: "/runpod-volume/huggingface/hub" }];
+  const f = fixture(({ body }) => body.query.startsWith("mutation")
+    ? { data: { saveEndpoint: { id: "ep-1", modelReferences: [] } } }
+    : { data: { myself: { endpoint: live } } });
   assert.deepEqual(await f.run(Runpod.getCachedModels({ id: "ep-1" })), []);
+  assert.equal(f.calls.length, 1);
   await f.run(Runpod.setCachedModels({ id: "ep-1", models: [] }));
-  assert.equal(f.calls.filter((c) => c.body.query.startsWith("mutation")).length, 0);
+  const writes = f.calls.filter((c) => c.body.query.startsWith("mutation"));
+  assert.equal(writes.length, 1);
+  assert.deepEqual(writes[0].body.variables.input.env, live.template.env);
+  assert.deepEqual(writes[0].body.variables.input.modelReferences, []);
 });
 
 test("GraphQL errors even with partial data preserve provider messages", async () => {
