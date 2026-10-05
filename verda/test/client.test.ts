@@ -38,6 +38,12 @@ const token = (value = "test-token") =>
     scope: "cloud-api-v1",
   });
 
+test("unrecognized REST statuses preserve provider messages", async () => {
+  const f = fixture((path) => path.endsWith("/token") ? token() : Response.json({ message: "Selected GPU is unavailable" }, { status: 418 }));
+  const error = await Effect.runPromise(Verda.listDeployments({}).pipe(Effect.flip, Effect.provide(await f.services)));
+  assert.equal(error.message, "Selected GPU is unavailable");
+});
+
 test("OAuth is lazy, caches concurrent requests, and renews before expiry", async () => {
   let issued = 0;
   let now = 0;
