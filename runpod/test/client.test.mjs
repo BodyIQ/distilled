@@ -145,6 +145,19 @@ test("404 is tagged and 204 deletion has no JSON body", async () => {
   await f.run(Runpod.deleteEndpoint({ id: "ep-1" }));
 });
 
+test("REST failures preserve RunPod's problem detail", async () => {
+  const message = "the declared port must match PORT";
+  const f = fixture(() =>
+    Response.json(
+      { title: "Bad Request", status: 400, detail: message },
+      { status: 400 },
+    ),
+  );
+  const error = await f.run(Runpod.getEndpoint({ id: "ep-1" }).pipe(Effect.flip));
+  assert.equal(error.message, message);
+  assert.equal(error._tag, "BadRequest");
+});
+
 test("strict decoding rejects malformed success responses without exposing their body", async () => {
   const f = fixture(() => ({ secret: "do-not-log" }));
   await assert.rejects(

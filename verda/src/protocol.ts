@@ -21,7 +21,6 @@ export const VerdaProtocol = makeRestProtocol<Config>({
     config.accessToken
       ? { Authorization: `Bearer ${Redacted.value(config.accessToken)}` }
       : {},
-  errorEnvelope: () => ({ message: "Verda request failed" }),
   unknownError: () => new VerdaError({ operation: "REST request" }),
   parseError: () => new VerdaError({ operation: "REST response validation" }),
 });

@@ -7,7 +7,6 @@ import * as Ref from "effect/Ref";
 import * as HttpClient from "effect/http/HttpClient";
 import { strict } from "@distilled.cloud/core/response-validation";
 import { Credentials, type Config } from "./credentials.js";
-import { VerdaError } from "./errors.js";
 import { getAccessToken } from "./services/verda.js";
 
 /** Allocate one OAuth token cache for a client. No request runs until an operation is invoked. */
@@ -41,7 +40,6 @@ export const fromClientCredentials = (
         Effect.provideService(Credentials, Effect.succeed({ apiBaseUrl })),
         Effect.provideService(HttpClient.HttpClient, http),
         Effect.provide(strict),
-        Effect.mapError(() => new VerdaError({ operation: "authentication" })),
       );
       const config = { apiBaseUrl, accessToken: Redacted.make(response.access_token) };
       yield* Ref.set(token, {
