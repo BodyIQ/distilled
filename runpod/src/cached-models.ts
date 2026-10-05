@@ -110,8 +110,8 @@ export const setCachedModels = Effect.fn(function* ({
   const { template, ...live } = myself.endpoint;
   if (live.id !== id)
     return yield* Effect.fail(new RunpodError({ operation: "cached models identity" }));
-  if (JSON.stringify(live.modelReferences ?? []) === JSON.stringify(models))
-    return live.modelReferences ?? [];
+  // REST v2 updates the bound template, but an older endpoint env override
+  // still wins at runtime. Refresh it even when model references are unchanged.
   const { saveEndpoint } = yield* graphql(
     "mutation CachedModels($input: EndpointInput!) { saveEndpoint(input: $input) { id modelReferences } }",
     {
