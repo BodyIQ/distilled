@@ -38,6 +38,12 @@ const token = (value = "test-token") =>
     scope: "cloud-api-v1",
   });
 
+test("unrecognized REST statuses preserve provider messages", async () => {
+  const f = fixture((path) => path.endsWith("/token") ? token() : Response.json({ message: "Selected GPU is unavailable" }, { status: 418 }));
+  const error = await Effect.runPromise(Verda.listDeployments({}).pipe(Effect.flip, Effect.provide(await f.services)));
+  assert.equal(error.message, "Selected GPU is unavailable");
+});
+
 test("OAuth is lazy, caches concurrent requests, and renews before expiry", async () => {
   let issued = 0;
   let now = 0;
@@ -121,9 +127,12 @@ test("404 is tagged, IDs are encoded, and empty deletion is supported", async ()
   assert.equal(f.requests[1].path, "/v1/container-deployments/missing%2Fname");
 });
 
-test("authentication and API failures retain the server's error message", async () => {
+test("authentication and API failures preserve the provider's error message", async () => {
   for (const mode of ["authentication", "api"] as const) {
-    const message = "name must be shorter than or equal to 45 characters";
+    const message =
+      mode === "api"
+        ? "name must be shorter than or equal to 45 characters"
+        : "invalid client credentials";
     const f = fixture((path) =>
       path.endsWith("/token")
         ? mode === "authentication"
@@ -131,10 +140,10 @@ test("authentication and API failures retain the server's error message", async 
           : token()
         : Response.json({ code: "invalid_request", message }, { status: 400 }),
     );
-    const services = await f.services;
     const error = await Effect.runPromise(
-      Verda.listDeployments({}).pipe(Effect.flip, Effect.provide(services)),
+      Verda.listDeployments({}).pipe(Effect.flip, Effect.provide(await f.services)),
     );
     assert.equal(error.message, message);
+    assert.equal(error._tag, mode === "api" ? "BadRequest" : "Unauthorized");
   }
 });

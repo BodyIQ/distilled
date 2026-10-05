@@ -38,5 +38,5 @@ and an export to this package, not another repository or workspace package.
 
 RunPod retains cursor pagination patches, SSE exclusions and its cached-model
 extension. Verda uses lazy OAuth credentials with serialized renewal, response
-nullability patches and literal volume discriminants. API error messages are
-preserved and credentials stay redacted. Runtime clients have no Alchemy dependency.
+nullability patches and literal volume discriminants. REST errors preserve the cloud's message, including RunPod problem details,
+and OAuth failures keep their original tagged error. Credentials stay redacted. Runtime clients have no Alchemy dependency.

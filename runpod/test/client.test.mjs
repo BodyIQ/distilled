@@ -74,6 +74,12 @@ function fixture(handle) {
   };
 }
 
+test("unrecognized REST statuses preserve provider messages", async () => {
+  const f = fixture(() => Response.json({ detail: "Selected GPU is unavailable" }, { status: 418 }));
+  const error = await f.run(Runpod.getEndpoint({ id: "ep-1" }).pipe(Effect.flip));
+  assert.equal(error.message, "Selected GPU is unavailable");
+});
+
 test("v2 calls encode IDs and resolve credentials on every request", async () => {
   const f = fixture(() => endpoint());
   await f.run(Runpod.getEndpoint({ id: "ep/1" }));
@@ -145,13 +151,17 @@ test("404 is tagged and 204 deletion has no JSON body", async () => {
   await f.run(Runpod.deleteEndpoint({ id: "ep-1" }));
 });
 
-test("REST failures retain the server's error message", async () => {
-  const message = "GPU pool is not available";
-  const f = fixture(() => Response.json({ message }, { status: 400 }));
-  await assert.rejects(
-    f.run(Runpod.getEndpoint({ id: "ep-1" })),
-    (error) => error.message === message,
+test("REST failures preserve RunPod's problem detail", async () => {
+  const message = "the declared port must match PORT";
+  const f = fixture(() =>
+    Response.json(
+      { title: "Bad Request", status: 400, detail: message },
+      { status: 400 },
+    ),
   );
+  const error = await f.run(Runpod.getEndpoint({ id: "ep-1" }).pipe(Effect.flip));
+  assert.equal(error.message, message);
+  assert.equal(error._tag, "BadRequest");
 });
 
 test("strict decoding rejects malformed success responses without exposing their body", async () => {
@@ -216,14 +226,14 @@ test("cache read and unchanged cache updates never write", async () => {
   assert.equal(f.calls.filter((c) => c.body.query.startsWith("mutation")).length, 0);
 });
 
-test("GraphQL errors retain the server's message even with partial data", async () => {
+test("GraphQL errors even with partial data preserve provider messages", async () => {
   const f = fixture(() => ({
     data: { myself: { endpoint: cachedConfig() } },
-    errors: [{ message: "Model revision is not available" }],
+    errors: [{ message: "Cached model revision was not found" }],
   }));
   await assert.rejects(
     f.run(Runpod.setCachedModels({ id: "ep-1", models: ["model"] })),
-    (error) => error.message === "Model revision is not available",
+    (error) => String(error).includes("Cached model revision was not found"),
   );
   assert.equal(f.calls.length, 1);
 });
